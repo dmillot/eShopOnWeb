@@ -23,7 +23,10 @@ pipeline {
 
         stage('Functional') {
           steps {
-            sh 'dotnet test tests/FunctionalTests'
+            warnError(message: 'Functional problem') {
+              sh 'dotnet test tests/FunctionalTests'
+            }
+
           }
         }
 
@@ -33,6 +36,10 @@ pipeline {
     stage('Publish') {
       steps {
         sh 'dotnet publish eShopOnWeb.sln -o /var/jenkins_home/aspnet'
+        dir(path: '/var/aspnet') {
+          archiveArtifacts(artifacts: '*', onlyIfSuccessful: true)
+        }
+
       }
     }
 
